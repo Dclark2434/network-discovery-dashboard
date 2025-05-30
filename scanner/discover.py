@@ -14,6 +14,7 @@ def is_alive(ip):
 
     https://docs.python.org/3/library/socket.html#socket.socket.connect"""
     try:
+        socket.setdefaulttimeout(1)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((str(ip), 80))
         return str(ip)
     except:
@@ -40,6 +41,7 @@ def scan_subnet(subnet):
             if result is True:
                 print(f"host alive: {result}")
                 alive_hosts.append(result)
+    return alive_hosts
 
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
