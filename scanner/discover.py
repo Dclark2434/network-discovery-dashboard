@@ -38,7 +38,7 @@ def scan_subnet(subnet):
     with ThreadPoolExecutor(max_workers=100) as executor:
         results = executor.map(is_alive, network.hosts())
         for result in results:
-            if result is True:
+            if result:
                 print(f"host alive: {result}")
                 alive_hosts.append(result)
     return alive_hosts
