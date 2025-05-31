@@ -18,9 +18,10 @@ def is_alive(ip):
     https://docs.python.org/3/library/socket.html#socket.socket.connect"""
 
     try:
-        socket.setdefaulttimeout(1)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((str(ip), 80))
-        return str(ip)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            if s.connect_ex((str(ip), 80)) == 0:
+                return str(ip)
     except:
         return None
 
@@ -90,6 +91,12 @@ def get_os(ip):
     pass
 
 def is_port_open(ip, port):
+    """Checks if port is open.
+
+    :param ip: string - ip we are checking
+    :param port: int - port we are checking
+    :return: Int or None - returns the port if open otherwise None
+    """
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(1)
@@ -110,7 +117,10 @@ def get_open_ports(ip, ports=None):
                 open_ports.append(result)
     return open_ports
 
-def enrich_devices(alive_hosts):
+def enrich_single_host(ip):
+    pass
+
+def enrich_all_hosts(alive_hosts):
     pass
 
             
