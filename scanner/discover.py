@@ -46,9 +46,9 @@ def scan_subnet(subnet):
     return alive_hosts
 
 def get_mac(ip):
-    """Gets MAC address for devices.
+    """Gets MAC address for device.
     
-    :param ip: string - A ip address.
+    :param ip: string - An ip address.
     :return: string - A mac address for the ip address passed in.
     
     A function that takes the passed in ip and looks up the MAC address using
@@ -66,6 +66,17 @@ def get_mac(ip):
             if found: # returning .group() on None resulted in AttributeError
                 return found.group()
     return None
+
+def get_hostname(ip):
+    """Gets hostname for device.
+    
+    :param ip: string - An ip address.
+    :return: string - The hostname for the passed in ip address.
+    
+    A function that uses the socket modules reverse lookup feature to find and 
+    return the hostname for the device with the provided ip."""
+
+    pass
             
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
