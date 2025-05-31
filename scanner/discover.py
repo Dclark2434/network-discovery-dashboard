@@ -43,6 +43,17 @@ def scan_subnet(subnet):
                 alive_hosts.append(result)
     return alive_hosts
 
+def get_mac(ip):
+    """Gets MAC address for devices.
+    
+    :param ip: string - A ip address.
+    :return: string - A mac address for the ip address passed in.
+    
+    A function that takes the passed in ip and looks up the MAC address using
+    arp commands."""
+
+    pass
+
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
     live = scan_subnet(subnet)
