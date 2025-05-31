@@ -3,6 +3,7 @@ import ipaddress
 import subprocess
 import re
 from concurrent.futures import ThreadPoolExecutor
+from ports import TOP_100_TCP_PORTS
 
 def is_alive(ip):
     """Checks if ip is responding.
@@ -15,6 +16,7 @@ def is_alive(ip):
     at the passed in IP.
 
     https://docs.python.org/3/library/socket.html#socket.socket.connect"""
+
     try:
         socket.setdefaulttimeout(1)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((str(ip), 80))
@@ -59,9 +61,10 @@ def get_mac(ip):
     for line in lines:
         if ip in line:
             print("found matching ip in arp table")
-            # below is the regex pattern for a mac address
-            # it looks for 5 matches of 2 pairs using the seen characters
-            # and then one more match (total 6) of pairs all seperated by : or -
+            # below is the regex pattern for a mac address. it looks for 5
+            # matches of pairs using the seen characters and then one more
+            # match (total 6) of pairs all seperated by : or - you know...like a
+            # mac address
             found = re.search("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))", line)
             if found: # returning .group() on None resulted in AttributeError
                 return found.group()
@@ -74,13 +77,38 @@ def get_hostname(ip):
     :return: string - The hostname for the passed in ip address.
     
     A function that uses the socket modules reverse lookup feature to find and 
-    return the hostname for the device with the provided ip."""
+    return the hostname for the device with the provided ip. If none found it
+    returns the original ip."""
 
     try:
         host_name = socket.gethostbyaddr(ip)[0]
         return host_name
     except socket.herror:
         return ip
+
+def get_os(ip):
+    pass
+
+def is_port_open(ip, port):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            if s.connect_ex((str(ip), port)) == 0:
+                return port
+    except:
+        return None
+
+def get_open_ports(ip, ports=None):
+    if ports is None:
+        ports = TOP_100_TCP_PORTS
+    open_ports = []
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        results = executor.map(lambda port: is_port_open(ip, port), ports)
+        for result in results:
+            if result:
+                print(f"Open Port: {result}")
+                open_ports.append(result)
+    return open_ports
 
 def enrich_devices(alive_hosts):
     pass
