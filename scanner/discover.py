@@ -76,7 +76,11 @@ def get_hostname(ip):
     A function that uses the socket modules reverse lookup feature to find and 
     return the hostname for the device with the provided ip."""
 
-    pass
+    try:
+        host_name = socket.gethostbyaddr(ip)[0]
+        return host_name
+    except socket.herror:
+        return ip
 
 def enrich_devices(alive_hosts):
     pass
