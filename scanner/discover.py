@@ -1,5 +1,7 @@
 import socket
 import ipaddress
+import subprocess
+import re
 from concurrent.futures import ThreadPoolExecutor
 
 def is_alive(ip):
@@ -52,7 +54,22 @@ def get_mac(ip):
     A function that takes the passed in ip and looks up the MAC address using
     arp commands."""
 
-    pass
+    output = subprocess.check_output(("arp", "-a"))
+    lines = output.splitlines()
+    for line in lines:
+        if ip in line:
+            print("found matching ip in arp table")
+            # below is the regex pattern for a mac address
+            # it looks for 5 matches of 2 pairs using the seen characters
+            # and then one more match (total 6) of 2 pairs all seperated by : or -
+            found = re.search("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))", line)
+            if found: # returning .group() on None resulted in AttributeError
+                return found.group()
+    return None
+            
+
+
+
 
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
