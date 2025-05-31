@@ -1,7 +1,4 @@
-import socket
-import ipaddress
-import subprocess
-import re
+import socket, ipaddress, subprocess, re
 from concurrent.futures import ThreadPoolExecutor
 from ports import TOP_100_TCP_PORTS
 
@@ -87,6 +84,7 @@ def get_hostname(ip):
     except socket.herror:
         return ip
 
+# Is there a way to do this without nmap?
 def get_os(ip):
     pass
 
@@ -105,6 +103,7 @@ def is_port_open(ip, port):
     except:
         return None
 
+# if i do implement nmap usage in future this can be the fallback if unavailable
 def get_open_ports(ip, ports=None):
     if ports is None:
         ports = TOP_100_TCP_PORTS
@@ -118,10 +117,17 @@ def get_open_ports(ip, ports=None):
     return open_ports
 
 def enrich_single_host(ip):
-    pass
+    host_data = {
+    "ip": ip,
+    "hostname": get_hostname(ip),
+    "mac": get_mac(ip),
+    "open_ports": get_open_ports(ip)
+    }
+    return host_data
 
 def enrich_all_hosts(alive_hosts):
-    pass
+    for host in alive_hosts:
+        enrich_single_host(host)
 
             
 if __name__ == "__main__":
