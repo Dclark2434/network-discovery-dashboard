@@ -77,6 +77,10 @@ def get_hostname(ip):
     return the hostname for the device with the provided ip."""
 
     pass
+
+def enrich_devices(alive_hosts):
+    pass
+
             
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
