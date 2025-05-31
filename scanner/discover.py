@@ -125,9 +125,14 @@ def enrich_single_host(ip):
     }
     return host_data
 
+# finally lets put it all together
 def enrich_all_hosts(alive_hosts):
-    for host in alive_hosts:
-        enrich_single_host(host)
+    enriched_alive_hosts = []
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        results = executor.map(lambda host: enrich_single_host(host), alive_hosts)
+        for result in results:
+            enriched_alive_hosts.append(result)
+    return enriched_alive_hosts
 
             
 if __name__ == "__main__":
