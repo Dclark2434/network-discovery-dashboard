@@ -61,16 +61,12 @@ def get_mac(ip):
             print("found matching ip in arp table")
             # below is the regex pattern for a mac address
             # it looks for 5 matches of 2 pairs using the seen characters
-            # and then one more match (total 6) of 2 pairs all seperated by : or -
+            # and then one more match (total 6) of pairs all seperated by : or -
             found = re.search("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))", line)
             if found: # returning .group() on None resulted in AttributeError
                 return found.group()
     return None
             
-
-
-
-
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
     live = scan_subnet(subnet)
