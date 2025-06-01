@@ -1,6 +1,6 @@
 import socket, ipaddress, subprocess, re
 from concurrent.futures import ThreadPoolExecutor
-from ports import TOP_100_TCP_PORTS, COMMON_PORTS
+from scanner.ports import TOP_100_TCP_PORTS, COMMON_PORTS
 
 def is_alive(ip):
     """Checks if ip is responding.
@@ -31,7 +31,7 @@ def scan_subnet(subnet):
     :return: [strings] - A list of all the ips that responded on the subnet.
     
     A function that utilizes the is_alive() function to scan and build a list of
-    all devices that are listening on port 80 on the provided subnet. Utilizes the
+    all devices that are listening on [COMMON_PORTS] on the provided subnet. Utilizes the
     ThreadPoolExecutor from the python standard library to run these checks concurrently.
     """
     network = ipaddress.ip_network(subnet, strict=False)

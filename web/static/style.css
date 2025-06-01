@@ -1,0 +1,219 @@
+/* Created by Dustin Clark for RK/SPC dashboards */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+/* resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #1c1c1e;
+    color: #fff;
+    text-align: center;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+}
+
+/* Navigation Bar */
+.navbar {
+    background-color: #252525;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-links li {
+    display: inline;
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: #f7f7f7;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.nav-links a:hover {
+    color: #d13729;
+}
+
+h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3em;
+    margin: 60px 0 40px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0px;
+    background: linear-gradient(to right, #B41C21, #d13729);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 2s ease-in-out;
+}
+
+
+h2 {
+    font-size: 2em;
+    color: #B41C21;
+    margin-bottom: 20px;
+}
+
+/* link styling */
+a {
+    display: inline-block;
+    margin: 15px;
+    font-size: 1.5em;
+    text-decoration: none;
+    padding: 10px 20px;
+    color: #fff;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    background: linear-gradient(145deg, #B41C21, #d13729);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    background: transparent;
+    color: #B41C21;
+    border: 2px solid #B41C21;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    color: #B41C21;
+    font-size: 1.8em;
+    margin: 0;
+    letter-spacing: -1px;
+    animation: none;
+}
+
+.rack-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.rack {
+    margin: 20px;
+    background: #252525;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.rack:hover {
+    transform: scale(1.05);
+}
+
+/* animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.top-center-graphic {
+    width: 400px;
+    position: center;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 20px auto;
+}
+
+/* mobile/tablet tweaks when using screens smaller than 768px */
+@media (max-width: 768px) {
+
+    h1 {
+        font-size: 1.6em;
+        margin: 20px 10px;
+        padding-top: 10px
+    }
+
+    .navbar {
+        padding: 10px 0;
+        position: relative;
+    }
+
+    .navbar .container {
+        flex-direction: column;
+        padding: 5px 10px;
+        position: relative;
+    }
+
+    .nav-links {
+        margin-top: 10px;
+        position: relative;
+        z-index: 1001;
+    }
+
+    .nav-links li {
+        display: block;
+        margin: 5px 0;
+    }
+
+    .top-center-graphic {
+        width: 300px;
+        position: relative;
+        margin: 0 auto 10px auto;
+        transform: none;
+        z-index: 1000;
+    }
+
+    .rack-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;      
+        width: 100%; 
+        padding: 0 10px;
+    }
+
+    .rack {
+        width: 100%;
+        max-width: 450px;
+        margin: 10px 0;
+    }
+
+    a {
+        font-size: 1em;
+        padding: 8px 10px;
+        margin: 5px;
+        word-break: break-word;
+    }
+
+    .logo {
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Dashboard</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <h1>Discovered Devices</h1>
+    <table border="1">
+        <tr>
+            <th>IP</th>
+            <th>Hostname</th>
+            <th>MAC Address</th>
+            <th>Open Ports</th>
+        </tr>
+        {% for host in hosts %}
+        <tr>
+            <td>{{ host.ip }}</td>
+            <td>{{ host.hostname }}</td>
+            <td>{{ host.mac }}</td>
+            <td>{{ host.open_ports | join(', ') }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
