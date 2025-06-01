@@ -12,7 +12,7 @@ def is_alive(ip):
     A function that utilizes the socket module to check if port 80 is responding 
     at the passed in IP.
 
-    https://docs.python.org/3/library/socket.html#socket.socket.connect"""
+    https://docs.python.org/3/library/socket.html#socket.socket.connect_ex"""
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -138,4 +138,5 @@ def enrich_all_hosts(alive_hosts):
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
     live = scan_subnet(subnet)
+    enrich_all_hosts(live)
     print(f"discovered {len(live)} hosts.")
