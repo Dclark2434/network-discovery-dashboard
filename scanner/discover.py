@@ -54,7 +54,7 @@ def get_mac(ip):
     A function that takes the passed in ip and looks up the MAC address using
     arp commands."""
 
-    output = subprocess.check_output(("arp", "-a"))
+    output = subprocess.check_output(("arp", "-a")).decode()
     lines = output.splitlines()
     for line in lines:
         if ip in line:
@@ -138,5 +138,6 @@ def enrich_all_hosts(alive_hosts):
 if __name__ == "__main__":
     subnet = "192.168.1.0/24"
     live = scan_subnet(subnet)
-    enrich_all_hosts(live)
+    output1 = enrich_all_hosts(live)
     print(f"discovered {len(live)} hosts.")
+    print(f"{output1}")
