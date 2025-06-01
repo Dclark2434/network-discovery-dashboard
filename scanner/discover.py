@@ -1,26 +1,28 @@
 import socket, ipaddress, subprocess, re
 from concurrent.futures import ThreadPoolExecutor
-from ports import TOP_100_TCP_PORTS
+from ports import TOP_100_TCP_PORTS, COMMON_PORTS
 
 def is_alive(ip):
     """Checks if ip is responding.
 
     :param ip: string - The IPv4 address that we are checking.
-    :return: string or None - If port 80 is open on target ip it will return the ip
-    for later storage, otherwise it will return None
+    :return: string or None - If [COMMON_PORTS] are open on target ip it will 
+    return the ip for later storage, otherwise it will return None
     
-    A function that utilizes the socket module to check if port 80 is responding 
-    at the passed in IP.
+    A function that utilizes the socket module to check if [COMMON_PORTS] are 
+    responding at the passed in IP.
 
     https://docs.python.org/3/library/socket.html#socket.socket.connect_ex"""
 
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(1)
-            if s.connect_ex((str(ip), 80)) == 0:
-                return str(ip)
-    except:
-        return None
+    for port in COMMON_PORTS:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.5)
+                if s.connect_ex((str(ip), port)) == 0:
+                    return str(ip)
+        except:
+            continue
+    return None
 
 def scan_subnet(subnet):
     """Reports hosts that are responding on subnet.
