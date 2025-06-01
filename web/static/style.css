@@ -217,3 +217,41 @@ a:hover {
         margin-bottom: 10px;
     }
 }
+
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    font-family: 'Poppins', sans-serif;
+    background-color: #1c1c1e;
+    color: #fff;
+    box-shadow: 0 0 10px #000;
+}
+
+th, td {
+    border: 1px solid #b41c21;
+    padding: 12px 18px;
+    text-align: left;
+}
+
+th {
+    background-color: #2c2c2e;
+    color: #b41c21;
+    font-size: 1.1em;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #2a2a2c;
+}
+
+tr:hover {
+    background-color: #3a3a3e;
+    transition: background-color 0.2s ease;
+}
+
+td:first-child:hover {
+    color: #d13729;
+    cursor: pointer;
+    text-shadow: 0 0 5px #b41c21;
+}
