@@ -10,4 +10,6 @@ TOP_100_TCP_PORTS = [
     8888, 9100, 9999, 10000, 32768, 49152, 49153, 49154, 49155, 49156, 49157
 ]
 
+# These are the ports that are used to check if a device is_alive().
+
 COMMON_PORTS = [80, 443, 22, 53]
