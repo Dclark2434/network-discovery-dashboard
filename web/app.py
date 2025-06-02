@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def dashboard():
-    subnet = "192.168.1.0/24"
+    subnet = "10.253.2.0/24"
     live_hosts = scan_subnet(subnet)
     enriched_hosts = enrich_all_hosts(live_hosts)
     return render_template("dashboard.html", hosts=enriched_hosts)

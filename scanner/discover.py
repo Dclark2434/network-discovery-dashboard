@@ -1,6 +1,8 @@
 import socket, ipaddress, subprocess, re
 from concurrent.futures import ThreadPoolExecutor
 from scanner.ports import TOP_100_TCP_PORTS, COMMON_PORTS
+from paramiko import SSHClient, AutoAddPolicy
+
 
 def is_alive(ip):
     """Checks if ip is responding.
@@ -48,27 +50,61 @@ def scan_subnet(subnet):
     return alive_hosts
 
 def get_mac(ip):
-    """Gets MAC address for device.
-    
-    :param ip: string - An ip address.
-    :return: string - A mac address for the ip address passed in.
-    
-    A function that takes the passed in ip and looks up the MAC address using
-    arp commands."""
+    """Gets MAC address for device via SSH to the router.
 
-    output = subprocess.check_output(("arp", "-a")).decode()
-    lines = output.splitlines()
-    for line in lines:
-        if ip in line:
-            print("found matching ip in arp table")
-            # below is the regex pattern for a mac address. it looks for 5
-            # matches of pairs using the seen characters and then one more
-            # match (total 6) of pairs all seperated by : or - you know...like a
-            # mac address
-            found = re.search("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))", line)
-            if found: # returning .group() on None resulted in AttributeError
-                return found.group()
+    :param ip: string - An ip address.
+    :return: string - A MAC address for the ip address passed in.
+
+    A function that uses paramiko to connect to the router and retrieve the MAC address
+    associated with the provided IP address. It assumes the router is .1 on the same subnet.
+    """
+    router_ip = str(ipaddress.ip_network(ip + '/24', strict=False).network_address + 1)
+    username = "username" # replace with actual username
+    password = "password" # replace with actual password
+
+    try:
+        client = SSHClient()
+        client.set_missing_host_key_policy(AutoAddPolicy())
+        client.connect(router_ip, username=username, password=password, banner_timeout=60)
+
+        stdin, stdout, stderr = client.exec_command("show ip arp vrf SCADA")
+        output = stdout.read().decode()
+
+        client.close()
+
+        # Parse the ARP table for the MAC address of the given IP
+        lines = output.splitlines()
+        for line in lines:
+            print("checking line: ", line)  # Debugging output
+            if ip in line:
+                # cisco does macs in xxxx.xxxx.xxxx format
+                found = re.search(r"(([0-9A-Fa-f]{4}[.]){2}([0-9A-Fa-f]{4}))", line)
+                if found:
+                    return found.group()
+    except Exception as e:
+        print(f"Error retrieving MAC address: {e}")
     return None
+# def get_mac(ip):
+#     """Gets MAC address for device.
+    
+#     :param ip: string - An ip address.
+#     :return: string - A mac address for the ip address passed in.
+    
+#     A function that takes the passed in ip and looks up the MAC address using
+#     arp commands."""
+    # output = subprocess.check_output(("arp", "-a")).decode()
+    # lines = output.splitlines()
+    # for line in lines:
+    #     if ip in line:
+    #         print("found matching ip in arp table")
+    #         # below is the regex pattern for a mac address. it looks for 5
+    #         # matches of pairs using the seen characters and then one more
+    #         # match (total 6) of pairs all seperated by : or - you know...like a
+    #         # mac address
+    #         found = re.search("(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))", line)
+    #         if found: # returning .group() on None resulted in AttributeError
+    #             return found.group()
+    # return None
 
 def get_hostname(ip):
     """Gets hostname for device.
@@ -138,7 +174,7 @@ def enrich_all_hosts(alive_hosts):
 
             
 if __name__ == "__main__":
-    subnet = "192.168.1.0/24"
+    subnet = "10.200.3.0/24"
     live = scan_subnet(subnet)
     output1 = enrich_all_hosts(live)
     print(f"discovered {len(live)} hosts.")
