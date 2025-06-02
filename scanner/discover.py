@@ -154,6 +154,8 @@ def get_open_ports(ip, ports=None):
                 open_ports.append(result)
     return open_ports
 
+# TODO - Make this more efficient by not running get_mac() for every host
+# only need it to run once than go parse each line for every found ip
 def enrich_single_host(ip):
     host_data = {
     "ip": ip,
