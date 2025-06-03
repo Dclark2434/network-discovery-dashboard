@@ -27,3 +27,24 @@ def test_env_var_db_path_used(tmp_path, monkeypatch):
     results = db.get_scan_results(scan_id)
     assert results[0]['ip'] == '3.3.3.3'
     assert env_db.exists()
+
+
+def test_get_latest_scan_results(tmp_path):
+    db_path = tmp_path / "latest.db"
+    hosts1 = [
+        {'ip': '1.1.1.1', 'hostname': 'h1', 'mac': 'm1', 'open_ports': [80]}
+    ]
+    hosts2 = [
+        {'ip': '2.2.2.2', 'hostname': 'h2', 'mac': 'm2', 'open_ports': [22]}
+    ]
+    db.save_scan_results(hosts1, db_path=str(db_path))
+    db.save_scan_results(hosts2, db_path=str(db_path))
+    results = db.get_latest_scan_results(db_path=str(db_path))
+    assert len(results) == 1
+    assert results[0]['ip'] == '2.2.2.2'
+
+
+def test_get_latest_scan_results_empty(tmp_path):
+    db_path = tmp_path / "empty.db"
+    results = db.get_latest_scan_results(db_path=str(db_path))
+    assert results == []
