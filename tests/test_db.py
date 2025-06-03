@@ -48,3 +48,22 @@ def test_get_latest_scan_results_empty(tmp_path):
     db_path = tmp_path / "empty.db"
     results = db.get_latest_scan_results(db_path=str(db_path))
     assert results == []
+
+
+def test_get_scan_history(tmp_path):
+    db_path = tmp_path / "history.db"
+    hosts1 = [{'ip': '1.1.1.1', 'hostname': 'h1', 'mac': 'm1', 'open_ports': []}]
+    hosts2 = [{'ip': '2.2.2.2', 'hostname': 'h2', 'mac': 'm2', 'open_ports': []}]
+    id1 = db.save_scan_results(hosts1, db_path=str(db_path))
+    id2 = db.save_scan_results(hosts2, db_path=str(db_path))
+    history = db.get_scan_history(db_path=str(db_path))
+    assert [record['id'] for record in history] == [id1, id2]
+
+
+def test_get_scan_history_env_var_used(tmp_path, monkeypatch):
+    env_db = tmp_path / "env_history.db"
+    monkeypatch.setenv('DB_PATH', str(env_db))
+    db.save_scan_results([{'ip': '1.1.1.1', 'hostname': 'h1', 'mac': 'm1', 'open_ports': []}])
+    history = db.get_scan_history()
+    assert len(history) == 1
+    assert env_db.exists()

@@ -83,3 +83,16 @@ def get_latest_scan_results(db_path: str = None):
             return []
         latest_id = row[0]
         return get_scan_results(latest_id, db_path=db_path)
+
+
+def get_scan_history(db_path: str = None):
+    """Return a list of all scans with their timestamps."""
+    with get_connection(db_path) as conn:
+        initialize_db(conn)
+        cur = conn.cursor()
+        cur.execute("SELECT id, timestamp FROM scans ORDER BY id ASC")
+        rows = cur.fetchall()
+        return [
+            {"id": row[0], "timestamp": row[1]}
+            for row in rows
+        ]
