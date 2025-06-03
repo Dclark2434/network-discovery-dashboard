@@ -20,7 +20,32 @@ def test_enrich_single_host_keys():
     ip = '192.168.1.3'
     with patch('scanner.discover.get_hostname', return_value='host'):
         with patch('scanner.discover.get_mac', return_value='00:11:22:33:44:55'):
-            with patch('scanner.discover.get_open_ports', return_value=[80]):
-                result = discover.enrich_single_host(ip)
+            with patch('scanner.discover.get_os', return_value='Linux'):
+                with patch('scanner.discover.get_open_ports', return_value=[80]):
+                    result = discover.enrich_single_host(ip)
     assert isinstance(result, dict)
-    assert set(result.keys()) == {'ip', 'hostname', 'mac', 'open_ports'}
+    assert set(result.keys()) == {'ip', 'hostname', 'mac', 'os', 'open_ports'}
+
+
+def test_get_os_and_mac_parse():
+    sample_output = """
+Host is up (0.001s latency).
+MAC Address: 00:11:22:33:44:55 (Vendor)
+OS details: Linux 3.X
+"""
+    with patch('scanner.discover.subprocess.check_output', return_value=sample_output.encode()):
+        os_name, mac = discover.get_os_and_mac('1.1.1.1')
+    assert os_name == 'Linux 3.X'
+    assert mac == '00:11:22:33:44:55'
+
+
+def test_get_open_ports_nmap_parse():
+    sample_output = """
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+443/tcp  open  https
+"""
+    with patch('scanner.discover.subprocess.check_output', return_value=sample_output.encode()):
+        ports = discover.get_open_ports('1.1.1.1', ports=[22, 80, 443])
+    assert ports == [22, 80, 443]

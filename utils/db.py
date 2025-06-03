@@ -12,6 +12,9 @@ def get_db_path() -> str:
 def get_connection(db_path: str = None):
     if db_path is None:
         db_path = get_db_path()
+    dirpath = os.path.dirname(db_path)
+    if dirpath:
+        os.makedirs(dirpath, exist_ok=True)
     conn = sqlite3.connect(db_path)
     try:
         yield conn
@@ -34,6 +37,7 @@ def initialize_db(conn: sqlite3.Connection):
                 ip TEXT,
                 hostname TEXT,
                 mac TEXT,
+                os TEXT,
                 open_ports TEXT,
                 FOREIGN KEY(scan_id) REFERENCES scans(id)
             )"""
@@ -49,8 +53,15 @@ def save_scan_results(hosts, db_path: str = None):
         for host in hosts:
             ports = ','.join(str(p) for p in host.get('open_ports', []))
             cur.execute(
-                "INSERT INTO hosts (scan_id, ip, hostname, mac, open_ports) VALUES (?, ?, ?, ?, ?)",
-                (scan_id, host.get('ip'), host.get('hostname'), host.get('mac'), ports)
+                "INSERT INTO hosts (scan_id, ip, hostname, mac, os, open_ports) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    scan_id,
+                    host.get('ip'),
+                    host.get('hostname'),
+                    host.get('mac'),
+                    host.get('os'),
+                    ports,
+                )
             )
         conn.commit()
         return scan_id
@@ -59,19 +70,20 @@ def get_scan_results(scan_id: int, db_path: str = None):
     with get_connection(db_path) as conn:
         initialize_db(conn)
         cur = conn.cursor()
-        cur.execute("SELECT ip, hostname, mac, open_ports FROM hosts WHERE scan_id=?", (scan_id,))
+        cur.execute("SELECT ip, hostname, mac, os, open_ports FROM hosts WHERE scan_id=?", (scan_id,))
         rows = cur.fetchall()
         result = []
-        for ip, hostname, mac, ports in rows:
+        for ip, hostname, mac, os_name, ports in rows:
+
             open_ports = [int(p) for p in ports.split(',') if p]
             result.append({
                 'ip': ip,
                 'hostname': hostname,
                 'mac': mac,
+                'os': os_name,
                 'open_ports': open_ports
             })
         return result
-
 def get_latest_scan_results(db_path: str = None):
     """Return hosts from the most recent scan if available."""
     with get_connection(db_path) as conn:
