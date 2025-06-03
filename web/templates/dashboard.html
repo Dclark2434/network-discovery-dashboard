@@ -31,6 +31,7 @@
             <th>IP</th>
             <th>Hostname</th>
             <th>MAC Address</th>
+            <th>OS</th>
             <th>Open Ports</th>
         </tr>
         {% for host in hosts %}
@@ -38,6 +39,7 @@
             <td>{{ host.ip }}</td>
             <td>{{ host.hostname }}</td>
             <td>{{ host.mac }}</td>
+            <td>{{ host.os or 'Unknown' }}</td>
             <td>{{ host.open_ports | join(', ') }}</td>
         </tr>
         {% endfor %}
