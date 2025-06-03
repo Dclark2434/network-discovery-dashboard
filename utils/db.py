@@ -71,3 +71,15 @@ def get_scan_results(scan_id: int, db_path: str = None):
                 'open_ports': open_ports
             })
         return result
+
+def get_latest_scan_results(db_path: str = None):
+    """Return hosts from the most recent scan if available."""
+    with get_connection(db_path) as conn:
+        initialize_db(conn)
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM scans ORDER BY id DESC LIMIT 1")
+        row = cur.fetchone()
+        if not row:
+            return []
+        latest_id = row[0]
+        return get_scan_results(latest_id, db_path=db_path)
