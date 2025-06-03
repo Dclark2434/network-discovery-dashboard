@@ -255,6 +255,28 @@ td:first-child:hover {
     cursor: pointer;
     text-shadow: 0 0 5px #b41c21;
 }
+
+button {
+    display: inline-block;
+    font-size: 1em;
+    padding: 10px 20px;
+    margin-left: 10px;
+    color: #fff;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    background: linear-gradient(145deg, #B41C21, #d13729);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: transparent;
+    color: #B41C21;
+    border: 2px solid #B41C21;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
 /* Loading overlay */
 
 #loading {
