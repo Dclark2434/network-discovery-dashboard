@@ -67,3 +67,14 @@ def test_get_scan_history_env_var_used(tmp_path, monkeypatch):
     history = db.get_scan_history()
     assert len(history) == 1
     assert env_db.exists()
+
+
+def test_db_directory_created(tmp_path):
+    db_path = tmp_path / "nested" / "created.db"
+    # parent directory does not exist yet
+    assert not db_path.parent.exists()
+    db.save_scan_results([
+        {'ip': '1.1.1.1', 'hostname': 'h', 'mac': 'm', 'os': 'Linux', 'open_ports': []}
+    ], db_path=str(db_path))
+    # connection should create the directory automatically
+    assert db_path.exists()
