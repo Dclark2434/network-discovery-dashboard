@@ -1,6 +1,1 @@
-socket
-ipaddress
-subprocess
-re
-concurrent
-flask
+Flask>=2.0
