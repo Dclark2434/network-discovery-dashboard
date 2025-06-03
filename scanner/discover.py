@@ -152,16 +152,35 @@ def is_port_open(ip, port):
 
 # if i do implement nmap usage in future this can be the fallback if unavailable
 def get_open_ports(ip, ports=None):
+    """Return list of open ports using nmap when available.
+
+    Falls back to a basic socket scan if nmap cannot be executed.
+    """
     if ports is None:
         ports = TOP_100_TCP_PORTS
-    open_ports = []
-    with ThreadPoolExecutor(max_workers=50) as executor:
-        results = executor.map(lambda port: is_port_open(ip, port), ports)
-        for result in results:
-            if result:
-                print(f"Open Port: {result}")
-                open_ports.append(result)
-    return open_ports
+
+    port_list = ','.join(str(p) for p in ports)
+    try:
+        output = subprocess.check_output(
+            ["nmap", "-p", port_list, "--open", "-n", ip],
+            stderr=subprocess.STDOUT,
+            timeout=30,
+        ).decode()
+        open_ports = []
+        for line in output.splitlines():
+            line = line.strip()
+            m = re.match(r"(\d+)/tcp\s+open", line)
+            if m:
+                open_ports.append(int(m.group(1)))
+        return open_ports
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+        open_ports = []
+        with ThreadPoolExecutor(max_workers=50) as executor:
+            results = executor.map(lambda port: is_port_open(ip, port), ports)
+            for result in results:
+                if result:
+                    open_ports.append(result)
+        return open_ports
 
 def enrich_single_host(ip):
     host_data = {
