@@ -1,6 +1,8 @@
 # Network Discovery Dashboard
 
-Simple dashboard for discovering devices on a local subnet.
+Simple dashboard for discovering devices on a local subnet. The discovery
+process performs a lightweight ping sweep of every host in the specified
+subnet and then gathers additional details for any responding device.
 
 ## Quick Start
 
