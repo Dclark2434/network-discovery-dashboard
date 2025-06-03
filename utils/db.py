@@ -2,10 +2,16 @@ import sqlite3
 import os
 from contextlib import contextmanager
 
-DB_PATH = os.environ.get('DB_PATH', os.path.join('data', 'devices.db'))
+DEFAULT_DB_PATH = os.path.join('data', 'devices.db')
+
+def get_db_path() -> str:
+    """Return the database path taking into account the DB_PATH env var."""
+    return os.environ.get('DB_PATH', DEFAULT_DB_PATH)
 
 @contextmanager
-def get_connection(db_path: str = DB_PATH):
+def get_connection(db_path: str = None):
+    if db_path is None:
+        db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     try:
         yield conn
@@ -34,7 +40,7 @@ def initialize_db(conn: sqlite3.Connection):
     )
     conn.commit()
 
-def save_scan_results(hosts, db_path: str = DB_PATH):
+def save_scan_results(hosts, db_path: str = None):
     with get_connection(db_path) as conn:
         initialize_db(conn)
         cur = conn.cursor()
@@ -49,7 +55,7 @@ def save_scan_results(hosts, db_path: str = DB_PATH):
         conn.commit()
         return scan_id
 
-def get_scan_results(scan_id: int, db_path: str = DB_PATH):
+def get_scan_results(scan_id: int, db_path: str = None):
     with get_connection(db_path) as conn:
         initialize_db(conn)
         cur = conn.cursor()
