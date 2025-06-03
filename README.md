@@ -11,9 +11,9 @@ pip install -r requirements.txt
 python web/app.py
 ```
 
-The default subnet scanned is `192.168.1.0/24`. Edit `web/app.py` if you need to
-scan a different range. Once running, visit `http://localhost:5000` to view the
-dashboard.
+Once running, visit `http://localhost:5000` and enter the subnet you want to
+scan. The scanner only runs when you submit the form, defaulting to
+`192.168.1.0/24` if no subnet is provided.
 
 ## Running Tests
 

@@ -7,6 +7,12 @@
 </head>
 <body>
     <h1>Discovered Devices</h1>
+    <form method="post">
+        <label for="subnet">Subnet to Scan:</label>
+        <input type="text" id="subnet" name="subnet" value="{{ subnet }}">
+        <button type="submit">Scan</button>
+    </form>
+    {% if hosts %}
     <table border="1">
         <tr>
             <th>IP</th>
@@ -23,5 +29,6 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
 </body>
 </html>
