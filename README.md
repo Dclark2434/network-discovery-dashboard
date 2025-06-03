@@ -6,7 +6,7 @@ subnet and then gathers additional details for any responding device.
 
 ## Quick Start
 
-Install the required packages and launch the Flask application:
+Install the required packages and make sure the `nmap` command is available, then launch the Flask application:
 
 ```bash
 pip install -r requirements.txt

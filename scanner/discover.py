@@ -4,6 +4,7 @@ import subprocess
 import re
 import platform
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from scanner.ports import TOP_100_TCP_PORTS
 
 def is_alive(ip):
@@ -65,7 +66,7 @@ def scan_subnet(subnet):
                 alive_hosts.append(result)
     return alive_hosts
 
-def get_mac(ip):
+def _get_mac_from_arp(ip):
     """Gets MAC address for device.
     
     :param ip: string - An ip address.
@@ -104,9 +105,35 @@ def get_hostname(ip):
     except socket.herror:
         return ip
 
-# Is there a way to do this without nmap?
+@lru_cache(maxsize=None)
+def get_os_and_mac(ip):
+    """Run nmap to obtain OS and MAC address information."""
+    try:
+        output = subprocess.check_output(["nmap", "-O", "-n", ip], stderr=subprocess.STDOUT, timeout=30).decode()
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+        return None, None
+    os_name = None
+    mac = None
+    for line in output.splitlines():
+        line = line.strip()
+        if line.startswith("OS details:"):
+            os_name = line.split("OS details:")[1].strip()
+        if "MAC Address:" in line:
+            m = re.search(r"([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}", line)
+            if m:
+                mac = m.group(0)
+    return os_name, mac
+
 def get_os(ip):
-    pass
+    os_name, _ = get_os_and_mac(ip)
+    return os_name
+
+
+def get_mac(ip):
+    _, mac = get_os_and_mac(ip)
+    if mac:
+        return mac
+    return _get_mac_from_arp(ip)
 
 def is_port_open(ip, port):
     """Checks if port is open.
@@ -138,10 +165,11 @@ def get_open_ports(ip, ports=None):
 
 def enrich_single_host(ip):
     host_data = {
-    "ip": ip,
-    "hostname": get_hostname(ip),
-    "mac": get_mac(ip),
-    "open_ports": get_open_ports(ip)
+        "ip": ip,
+        "hostname": get_hostname(ip),
+        "mac": get_mac(ip),
+        "os": get_os(ip),
+        "open_ports": get_open_ports(ip)
     }
     return host_data
 
