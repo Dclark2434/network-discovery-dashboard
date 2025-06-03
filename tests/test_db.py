@@ -15,3 +15,15 @@ def test_save_and_get_scan_results(tmp_path, monkeypatch):
     assert len(results) == 2
     assert results[0]['ip'] == '1.1.1.1'
     assert 80 in results[0]['open_ports']
+
+
+def test_env_var_db_path_used(tmp_path, monkeypatch):
+    env_db = tmp_path / "env.db"
+    monkeypatch.setenv('DB_PATH', str(env_db))
+    hosts = [
+        {'ip': '3.3.3.3', 'hostname': 'host3', 'mac': '00:33', 'open_ports': []}
+    ]
+    scan_id = db.save_scan_results(hosts)
+    results = db.get_scan_results(scan_id)
+    assert results[0]['ip'] == '3.3.3.3'
+    assert env_db.exists()
