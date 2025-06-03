@@ -1,27 +1,44 @@
-import socket, ipaddress, subprocess, re
+import socket
+import ipaddress
+import subprocess
+import re
+import platform
 from concurrent.futures import ThreadPoolExecutor
-from scanner.ports import TOP_100_TCP_PORTS, COMMON_PORTS
+from scanner.ports import TOP_100_TCP_PORTS
 
 def is_alive(ip):
-    """Checks if ip is responding.
+    """Check if the given host responds to a ping request.
 
-    :param ip: string - The IPv4 address that we are checking.
-    :return: string or None - If [COMMON_PORTS] are open on target ip it will 
-    return the ip for later storage, otherwise it will return None
-    
-    A function that utilizes the socket module to check if [COMMON_PORTS] are 
-    responding at the passed in IP.
+    Parameters
+    ----------
+    ip : str
+        The IPv4 address to probe.
 
-    https://docs.python.org/3/library/socket.html#socket.socket.connect_ex"""
+    Returns
+    -------
+    str or None
+        Returns the IP address if the host responds, otherwise ``None``.
 
-    for port in COMMON_PORTS:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(0.5)
-                if s.connect_ex((str(ip), port)) == 0:
-                    return str(ip)
-        except:
-            continue
+    The previous implementation attempted to connect to a handful of common
+    TCP ports. While that works for many devices, it can miss hosts with all of
+    those ports closed. Performing a small ICMP ping is much faster and gives a
+    better view of all hosts on the subnet.
+    """
+
+    system = platform.system().lower()
+    if system == "windows":
+        cmd = ["ping", "-n", "1", "-w", "1000", str(ip)]
+    else:
+        cmd = ["ping", "-c", "1", "-W", "1", str(ip)]
+
+    try:
+        result = subprocess.run(
+            cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        if result.returncode == 0:
+            return str(ip)
+    except Exception:
+        pass
     return None
 
 def scan_subnet(subnet):
@@ -30,9 +47,10 @@ def scan_subnet(subnet):
     :param subnet: string - The subnet that is being scanned.
     :return: [strings] - A list of all the ips that responded on the subnet.
     
-    A function that utilizes the is_alive() function to scan and build a list of
-    all devices that are listening on [COMMON_PORTS] on the provided subnet. Utilizes the
-    ThreadPoolExecutor from the python standard library to run these checks concurrently.
+    A function that utilizes the :func:`is_alive` function to scan and build a
+    list of all devices that respond to a ping on the provided subnet. It uses
+    :class:`ThreadPoolExecutor` from the Python standard library to run these
+    checks concurrently.
     """
     network = ipaddress.ip_network(subnet, strict=False)
     print(f"scanning {subnet}...")
