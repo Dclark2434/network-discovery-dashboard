@@ -12,6 +12,9 @@
         <input type="text" id="subnet" name="subnet" value="{{ subnet }}">
         <button type="submit">Scan</button>
     </form>
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
     {% if hosts %}
     <table border="1">
         <tr>
@@ -30,5 +33,6 @@
         {% endfor %}
     </table>
     {% endif %}
+    <script src="../static/script.js"></script>
 </body>
 </html>
