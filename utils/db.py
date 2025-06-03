@@ -12,6 +12,9 @@ def get_db_path() -> str:
 def get_connection(db_path: str = None):
     if db_path is None:
         db_path = get_db_path()
+    dirpath = os.path.dirname(db_path)
+    if dirpath:
+        os.makedirs(dirpath, exist_ok=True)
     conn = sqlite3.connect(db_path)
     try:
         yield conn
