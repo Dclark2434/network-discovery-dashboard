@@ -37,3 +37,15 @@ OS details: Linux 3.X
         os_name, mac = discover.get_os_and_mac('1.1.1.1')
     assert os_name == 'Linux 3.X'
     assert mac == '00:11:22:33:44:55'
+
+
+def test_get_open_ports_nmap_parse():
+    sample_output = """
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+443/tcp  open  https
+"""
+    with patch('scanner.discover.subprocess.check_output', return_value=sample_output.encode()):
+        ports = discover.get_open_ports('1.1.1.1', ports=[22, 80, 443])
+    assert ports == [22, 80, 443]
